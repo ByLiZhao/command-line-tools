@@ -17,3 +17,9 @@ It can be installed by
 ```bash
 cargo install bat
 ```
+
+4. Install cargo-update
+```bash
+cargo install cargo-update
+```
+So that all installed tools can be updated with `cargo install-update -a`
