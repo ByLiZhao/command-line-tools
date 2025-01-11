@@ -18,4 +18,5 @@ git pull
 ./autogen.sh
 ./configure --prefix=/home/johnzli/home_local/
 make && make install
+popd
 
