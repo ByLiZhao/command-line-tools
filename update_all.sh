@@ -2,7 +2,7 @@
 
 # update fzf
 pushd /home/johnzli/home_local/src/fzf
-git pull &&  ./install -all
+git pull &&  ./install  --all
 popd
 
 # upodate Rust tools
