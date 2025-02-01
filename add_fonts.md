@@ -1,6 +1,10 @@
 # Add new fonts to Ubuntu so that several commanmd line tools can work correctly
 1. Install [powerline fonts](https://github.com/powerline/fonts)
 ```bash
+# install gnome fonts viewer
+sudo apt install gnome-font-viewer
+# more math symbols
+sudo apt install fonts-mathjax fonts-mathjax-extras
 sudo apt-get install fonts-powerline
 ```
 2. Install Microsoft fonts
