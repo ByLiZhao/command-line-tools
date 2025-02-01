@@ -3,8 +3,8 @@
 ```bash
 # install gnome fonts viewer
 sudo apt install gnome-font-viewer
-# more math symbols
-sudo apt install fonts-mathjax fonts-mathjax-extras
+# more math symbols and other symbols
+sudo apt install fonts-mathjax fonts-mathjax-extras fonts-symbola
 sudo apt-get install fonts-powerline
 ```
 2. Install Microsoft fonts
