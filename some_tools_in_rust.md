@@ -17,9 +17,12 @@ It can be installed by
 ```bash
 cargo install bat
 ```
+4. [broot](https://github.com/Canop/broot), like "ranger" but written in Rust, a TUI application
+  to navigate directories, apply command to files, and perform usual file operations.
 
 4. Install cargo-update
 ```bash
 cargo install cargo-update
 ```
 So that all installed tools can be updated with `cargo install-update -a`
+
