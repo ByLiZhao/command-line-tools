@@ -5,6 +5,8 @@ pushd /home/johnzli/home_local/src/fzf
 git pull &&  ./install  --all
 popd
 
+# update Rust toolchian
+rustup update
 # upodate Rust tools
 cargo install-update -a
 
