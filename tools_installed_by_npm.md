@@ -4,7 +4,7 @@
 - After extracting the compressed folder, `cp` the "bin  include  lib  share"
 to `~/home_local`.
 
-2. Add the following to `.zshrc`
+2. Add the following to `.bashrc`
 ```bash
 NPM_PACKAGES="${HOME}/.npm-packages"
 NODE_PATH="$NPM_PACKAGES/lib/node_modules:$NODE_PATH"
@@ -16,7 +16,7 @@ export MANPATH="${MANPATH-$(manpath)}:$NPM_PACKAGES/share/man"
 ```
 3. Writhe the following `prefix = /home/johnzli/.npm-packages` in `~/.npmrc`.
 4. Install `yarn` using `npm install --global yarn`
-5. Build ``
+5. Build
 ```bash
 cd ~/.vim/plugged/markdown-preview.nvim
 yarn install
