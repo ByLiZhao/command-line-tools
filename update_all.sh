@@ -13,7 +13,9 @@ cargo install-update -a
 cargo install --force --git https://github.com/neovide/neovide
 
 # update JS tools
-npm outdated |npm update
+npm install -g npm
+npm install -g yarn
+npm update -g
 rm package-lock.json
 
 # update ctags

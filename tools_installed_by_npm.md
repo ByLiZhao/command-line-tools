@@ -16,11 +16,6 @@ export MANPATH="${MANPATH-$(manpath)}:$NPM_PACKAGES/share/man"
 ```
 3. Writhe the following `prefix = /home/johnzli/.npm-packages` in `~/.npmrc`.
 4. Install `yarn` using `npm install --global yarn`
-5. Build
-```bash
-cd ~/.vim/plugged/markdown-preview.nvim
-yarn install
-# hope can remove the below in future
-export NODE_OPTIONS=--openssl-legacy-provider
-yarn build
-```
+
+Currently, I do not use any command line tools that are written in Javascript.
+This configuration is kept just in case.
