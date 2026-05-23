@@ -16,8 +16,10 @@ HISTCONTROL=ignoreboth
 shopt -s histappend
 
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-HISTSIZE=1000
-HISTFILESIZE=2000
+# set history size as unlimited
+HISTSIZE=
+HISTFILESIZE=
+export HISTFILE=$HOME/.bash_history
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
@@ -43,7 +45,7 @@ esac
 # uncomment for a colored prompt, if the terminal has the capability; turned
 # off by default to not distract the user: the focus in a terminal window
 # should be on the output of commands, not on the prompt
-#force_color_prompt=yes
+force_color_prompt=yes
 
 if [ -n "$force_color_prompt" ]; then
     if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
@@ -116,9 +118,9 @@ if ! shopt -oq posix; then
   fi
 fi
 
-export PATH=/home/johnzli/home_local/bin:$PATH
-alias python=python3
+###############################################################################
 . "$HOME/.cargo/env"
+alias python=python3
 
 # fzf
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
@@ -144,3 +146,230 @@ export PATH="$PATH:$NPM_PACKAGES/bin"
 # Preserve MANPATH if you already defined it somewhere in your config.
 # Otherwise, fall back to `manpath` so we can inherit from `/etc/manpath`.
 export MANPATH="${MANPATH-$(manpath)}:$NPM_PACKAGES/share/man"
+# Prepend PATH with ~/home_local/bin 
+export PATH=/home/johnzli/home_local/bin:$PATH
+
+#############################################################################
+# Some useful commands and functions
+alias du="du -h -a -c --max-depth=1"
+alias cmake_gen="cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1"
+alias cmake_r="cmake -DCMAKE_BUILD_TYPE=Release"
+alias cmake_d="cmake -DCMAKE_BUILD_TYPE=Debug"
+alias vimdiff="vim -d"
+# 2 level ls
+alias ls2='ls -d **/*'
+# ls the parent dir
+alias ls0='ls -d ../*'
+
+# pp is for pushd-popd combined
+# for a file, pushd into its containing dir
+# for a dir, pushd to the dir 
+# if no para, do popd
+function pp(){
+  if [[ -d "$1" ]]; then
+    pushd "$1" > /dev/null
+  elif [[ -f "$1" ]]; then
+    pushd $(dirname "$1") > /dev/null
+  else
+    popd > /dev/null 
+  fi
+}
+
+# find all git repo's in current dir
+# if 1 para, find a git repo with its path matching the pattern
+# if 0 para, list all git repo in current dir
+function gitrepo(){
+  if [ "$#" -eq 1 ]; then
+    find . -name "*.git" |xargs dirname |grep -P "$1"
+  else
+    find . -name "*.git" |xargs dirname
+  fi
+}
+
+# match files path with patterns, ignore hidden
+# ff pattern
+# ff pattern_1 pattern_2
+# ff pattern_1 pattern_2 pattern_3
+function ff(){
+  local my_file=$(mktemp /tmp/fdf_johnzli_XXXXXXXX)
+  find . -type f -iname "README" -or -name "*.sh" -or -name "*.py" -or -name "*.lua" \
+    -or -name "*.h" -or -name "*.c" -or -name "*.cpp" -or -name "*.cc" -or -name "*.hh" \
+    -or -name "*.rs" -or -name "*.hs" -or -name "*.ysh" > "$my_file"
+  if [ "$#" -eq 1 ]; then
+    grep -P "$1" "$my_file"  |grep -v -P '\/\..*'
+  elif [ "$#" -eq 2 ]; then
+    grep -P "$1" "$my_file"  |grep -P "$2" |grep -v -P '\/\..*'
+  elif [ "$#" -eq 3 ]; then
+    grep -P "$1" "$my_file"  |grep -P "$2" |grep -P "$2" |grep -v -P '\/\..*'
+  fi
+  rm $my_file
+}
+
+# match file lines
+# fl pattern: find the files that contain the pattern
+# fl pattern1 pattern2 find the files that contain pattern1 in files returned by 'ff pattern2'
+# fl pattern1 pattern2 pattern3, find files that contain pattern1 in files returned by 'ff pattern2 pattern3'
+function fl(){
+  if [ "$#" -eq 1 ]; then
+    find . -type f -iname "README" -or -name "*.sh" -or -name "*.py" -or -name "*.lua" \
+      -or -name "*.h" -or -name "*.c" -or -name "*.cpp" -or -name "*.cc" -or -name "*.hh" \
+      -or -name "*.rs" -or -name "*.hs" -or -name "*.ysh" \
+     |xargs grep -s -n -P "$1" |grep -v -P '\/\..*'
+  else 
+    # forward para from 2
+    ff "${@:2}" |xargs grep -n -P "$1"
+  fi
+}
+
+# sort by length then alphanumerically,
+# get input from stdin
+# also remove duplicate items
+# "-f2-" in cut to handle the case there is space in input
+function sort_by_len(){
+  # naked cat to get input from stdin
+  cat |awk '{ print length, $0}' |sort -u -n -k1,1 -k2 |cut -d' ' -f2-
+}
+
+# backward cd
+# bd select from sub-dirs of parent dir up to deptth-3 dirs
+# bd pattern, search in sub-dirs of parent dir, only show the first 25 match
+# bd pattern1 .. up to 3, same as above but match all patterns
+# after selection, "pp" into the dir
+function bd(){
+  local arr=()
+  # 'find /path/to/dir -mindepth 1 -type d ' to find all sub-dir but no root dir
+  # -not -path '*/*' ignores hidden dirs
+  if [ "$#" -eq 0 ]; then
+   arr=($(find .. -maxdepth 3 -not -path '*/.*' -type d 2>/dev/null |sort_by_len |head -n 25 )) 
+  elif [ "$#" -eq 1 ]; then
+   arr=($(find .. -mindepth 2 -not -path '*/.*' -type d 2>/dev/null |grep -P "$1" |sort_by_len |head -n 25 )) 
+  elif [ "$#" -eq 2 ]; then
+   arr=($(find .. -mindepth 2 -not -path '*/.*' -type d 2>/dev/null |grep -P "$1" |grep -P "$2" |sort_by_len |head -n 25 )) 
+  elif [ "$#" -eq 2 ]; then
+   arr=($(find .. -mindepth 2 -not -path '*/.*' -type d 2>/dev/null |grep -P "$1" |grep -P "$2" |grep -P "$3" |sort_by_len |head -n 25 )) 
+  fi
+
+  local result=()
+  # convert path to be relative to current PWD
+  for element in "${arr[@]}"; do
+    result+=("$(realpath --relative-to="$PWD" "$element")")
+  done
+  
+  # select path
+  select opt in "${result[@]}"
+  do 
+    case $opt in
+        *) break
+           ;;
+    esac
+  done
+
+  if [[ "$opt" ]]; then
+      pushd "$opt" > /dev/null
+  fi
+}
+
+# search in history
+function hd(){
+  # the awk command is to remove duplicate without sorting
+  grep -w -a "$1" $HISTFILE |grep -v '^hd' --no-filename |awk '!x[$0]++' |tail -n25
+}
+
+# undo last commit, keep changes staged
+function git_backstep(){
+  git reset --soft HEAD~1
+  echo "commit again with a better commit sessage"
+}
+
+# use python as calculator
+function py(){
+  local var=print\("$*"\)
+  python3 -c "$var"
+}
+
+# timer
+# no para, show s running timer
+# 1 para, sleep for specified time, alarm
+# example timer 10s/1h/1m, default to s
+function timer(){
+  if [ "$#" -eq 0 ]; then
+    local dd=$(date +%H:%M:%S:%N-ns)
+    echo "$dd"
+    while true; do d=$(date +%H:%M:%S:%N-ns); echo -en "\r$d"; done
+  else 
+    if [[ $1 =~ ^[0-9]+$ ]]; then
+      # we have a number
+      # disown to not show "Done..."
+      (sleep "$1" ; echo -e "\a ${1}s has elapsed") & disown
+    else
+      (sleep "$1" ; echo -e "\a $1 has elapsed") & disown
+    fi
+  fi
+}
+
+# swap 2 files
+# 2 files must have same file extension
+function swap_file(){
+  if [ "$#" -ne 2 ]; then
+    echo "expecting 2 files"
+    return 0; # not an error, No-op
+  fi
+
+  if [ ! -f "$1" ]; then
+    echo "$1 is not a file"
+    return 0;
+  fi
+
+  if [ ! -f "$2" ]; then
+    echo "$2 is not a file"
+    return 0;
+  fi
+
+  # para expansion to find file extension
+  local ext1="${1#*.}"
+  local ext2="${2#*.}"
+  [ "$ext1" = "$1" ] && ext1="" # handle no extension case
+  [ "$ext2" = "$2" ] && ext2="" 
+  if [ ! "$ext1" = "$ext2" ]; then
+    echo "file type does not match"
+    return 0
+  fi
+
+  if [ -z "$ext1" ]; then # no extension case
+    echo "$1 has not file extension"
+    return 0
+  fi
+
+  if [ -z "$ext2" ]; then # no extension case
+    echo "$2 has not file extension"
+    return 0
+  fi
+
+  # swap file
+  local TMP_FILE=$(mktemp -q ./tmp.XXXXXXXX)
+  if [ $? -ne 0 ]; then
+    echo "can't create temp file"
+    return 0
+  fi
+
+  mv "$1" $TMP_FILE && mv "$2" "$1" && mv $TMP_FILE "$2"
+}
+
+# remove temp files
+function tmp_remove(){
+  local current_dir=$(pwd -P)
+  cd /tmp && yes | rm -rf ./* 2>/dev/null
+  cd $HOME/.vim_temp && yes | rm -rf ./* 2>/dev/null
+  cd "$current_dir"
+}
+
+# print current git branch
+function gitbranch(){
+  git branch &>/dev/null;
+  if [ $? -eq 0 ]; then
+    git branch |grep '*' |cut -d' ' -f2
+  fi
+  return 0
+}
+
+###############################################################################
