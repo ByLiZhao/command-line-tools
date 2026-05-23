@@ -5,7 +5,7 @@ the command will update it to the latest version:
 ```bash
 cargo install ripgrep
 ```
-2. [fd-find], like `find` but faster and with a better user interface. The
+2. [fd-find](https://github.com/sharkdp/fd), like `find` but faster and with a better user interface. The
 executable name is `fd`. It can be
 installed by
 ```
@@ -17,12 +17,19 @@ It can be installed by
 ```bash
 cargo install bat
 ```
-4. [broot](https://github.com/Canop/broot), like "ranger" but written in Rust, a TUI application
-  to navigate directories, apply command to files, and perform usual file operations.
 
-4. Install cargo-update
+4. [xan](https://github.com/medialab/xan#cargo), a tool to process large csv files
+```bash
+cargo install xan --locked
+```
+
+5. Install cargo-update
 ```bash
 cargo install cargo-update
 ```
 So that all installed tools can be updated with `cargo install-update -a`
 
+6. [neovide](https://github.com/neovide/neovide) A GUI program that works with Noevim
+```bash
+cargo install --git https://github.com/neovide/neovide
+```

@@ -9,6 +9,8 @@ popd
 rustup update
 # upodate Rust tools
 cargo install-update -a
+# update neovide
+cargo install --force --git https://github.com/neovide/neovide
 
 # update JS tools
 npm outdated |npm update
@@ -22,3 +24,9 @@ git pull
 make && make install
 popd
 
+# update nvim
+pushd /home/johnzli/home_local/src/neovim
+git pull
+make CMAKE_BUILD_TYPE=RelWithDebInfo CMAKE_INSTALL_PREFIX=/home/johnzli/home_local
+make && make install
+popd
