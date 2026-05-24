@@ -120,6 +120,7 @@ fi
 
 ###############################################################################
 . "$HOME/.cargo/env"
+[ -f "/home/johnzli/.ghcup/env" ] && . "/home/johnzli/.ghcup/env" # ghcup-env
 alias python=python3
 
 # fzf
