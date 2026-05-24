@@ -29,7 +29,3 @@ cargo install cargo-update
 ```
 So that all installed tools can be updated with `cargo install-update -a`
 
-6. [neovide](https://github.com/neovide/neovide) A GUI program that works with Noevim
-```bash
-cargo install --git https://github.com/neovide/neovide
-```
